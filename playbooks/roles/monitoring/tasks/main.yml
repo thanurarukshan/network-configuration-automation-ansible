@@ -1,7 +1,18 @@
 ---
-# tasks file for monitoring
+- name: Update package cache (Debian-based systems)
+  ansible.builtin.apt:
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+- name: Install EPEL repository (RHEL-based systems)
+  ansible.builtin.yum:
+    name: epel-release
+    state: present
+  when: ansible_os_family == "RedHat"
+
 - name: Install monitoring tools
   ansible.builtin.package:
     name: "{{ monitoring_tools }}"
     state: present
+  ignore_errors: yes
 
