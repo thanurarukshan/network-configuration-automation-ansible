@@ -1,18 +1,9 @@
 ---
-# tasks file for user-management
 - name: Create users
   ansible.builtin.user:
     name: "{{ item.name }}"
-    uid: "{{ item.uid | default(omit) }}"
-    groups: "{{ item.groups | default(omit) }}"
-    password: "{{ item.password }}"
+    password: "{{ item.password | password_hash('sha512') }}"  # Plain password is not hashed, it's used directly here
     shell: /bin/bash
+    state: present
   with_items: "{{ users }}"
-
-- name: Remove users
-  ansible.builtin.user:
-    name: "{{ item.name }}"
-    state: absent
-    remove: yes
-  with_items: "{{ remove_users }}"
 

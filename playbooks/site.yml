@@ -9,7 +9,7 @@
   become: yes
   roles:
     #- network-configuration-set
-    #- user-management
+    - user-management
     #- package-management
     #- system-tuning
-    - monitoring
+    #- monitoring
