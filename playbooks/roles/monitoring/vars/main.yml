@@ -1,0 +1,8 @@
+---
+# vars file for monitoring
+monitoring_tools:
+  - htop
+  - iotop
+  - sysstat
+  - netdata
+

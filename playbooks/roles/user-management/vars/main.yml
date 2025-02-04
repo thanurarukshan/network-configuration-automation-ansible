@@ -1,0 +1,12 @@
+---
+# vars file for user-management
+users:
+  - name: devops
+    uid: 1001
+    groups: sudo,docker
+    password: "{{ 'password123' | password_hash('sha512') }}"  # Securely hash passwords
+    ssh_key: "ssh-rsa AAAA..."
+
+remove_users:
+  - name: old_user
+

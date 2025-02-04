@@ -1,0 +1,11 @@
+---
+# vars file for package-management
+install_packages:
+  - git
+  - vim
+  - curl
+  - wget
+
+remove_packages:
+  #- nano
+

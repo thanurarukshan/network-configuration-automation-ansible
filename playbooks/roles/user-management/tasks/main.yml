@@ -1,0 +1,18 @@
+---
+# tasks file for user-management
+- name: Create users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    uid: "{{ item.uid | default(omit) }}"
+    groups: "{{ item.groups | default(omit) }}"
+    password: "{{ item.password }}"
+    shell: /bin/bash
+  with_items: "{{ users }}"
+
+- name: Remove users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    state: absent
+    remove: yes
+  with_items: "{{ remove_users }}"
+
