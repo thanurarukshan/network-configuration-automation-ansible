@@ -1,0 +1,1 @@
+ansible-playbook -i playbooks/dev.ini playbooks/site.yml --ask-become-pass

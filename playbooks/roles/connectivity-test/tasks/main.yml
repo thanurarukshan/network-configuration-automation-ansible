@@ -1,2 +1,5 @@
 ---
 # tasks file for connectivity-test
+- name: Ping target servers
+  ansible.builtin.ping:
+

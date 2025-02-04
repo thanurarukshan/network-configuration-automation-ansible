@@ -1,2 +1,19 @@
 ---
 # handlers file for network-configuration-set
+# roles/network-configuration-automation/handlers/main.yml
+
+- name: Restart Network
+  ansible.builtin.service:
+    name: NetworkManager
+    state: restarted
+
+- name: Restart SSH
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+
+- name: Restart NTP
+  ansible.builtin.service:
+    name: chronyd
+    state: restarted
+

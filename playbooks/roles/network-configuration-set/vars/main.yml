@@ -1,2 +1,39 @@
 ---
 # vars file for network-configuration-set
+# roles/network-configuration-automation/vars/main.yml
+
+# Network Interface Configuration
+network_interface: eth0  # The network interface to configure (e.g., eth0, ens33)
+
+# IP Configuration
+use_dhcp: true  # Set to false for a static IP configuration
+static_ip: "192.168.1.100"  # Static IP address (if use_dhcp is false)
+netmask: "255.255.255.0"  # Netmask (if use_dhcp is false)
+gateway: "192.168.1.1"  # Default gateway (if use_dhcp is false)
+
+# DNS Configuration
+dns_servers:
+  - "8.8.8.8"
+  - "8.8.4.4"
+
+# Hostname Configuration
+set_hostname: true  # Whether to change the hostname
+hostname: "network-node"  # The desired hostname
+
+# SSH Configuration
+disable_root_login: true  # Disable root login via SSH (true/false)
+ssh_port: 22  # SSH port number (default: 22)
+
+# Firewall Configuration
+firewall_enable: true  # Enable or disable firewall (true/false)
+open_ports:
+  - 22   # Open SSH port
+  - 80   # Open HTTP port
+  - 443  # Open HTTPS port
+
+# NTP Configuration
+enable_ntp: true  # Enable NTP service for time synchronization
+ntp_servers:
+  - "time.google.com"
+  - "time.nist.gov"
+

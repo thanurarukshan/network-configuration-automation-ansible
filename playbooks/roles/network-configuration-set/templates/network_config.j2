@@ -1,0 +1,9 @@
+DEVICE={{ network_interface }}
+BOOTPROTO={{ 'dhcp' if use_dhcp else 'static' }}
+ONBOOT=yes
+{% if not use_dhcp %}
+IPADDR={{ static_ip }}
+NETMASK={{ netmask }}
+GATEWAY={{ gateway }}
+{% endif %}
+
