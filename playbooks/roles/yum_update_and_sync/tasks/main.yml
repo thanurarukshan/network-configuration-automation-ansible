@@ -1,0 +1,20 @@
+# /playbooks/roles/yum_update_and_sync/tasks/main.yml
+---
+- name: Update all packages without prompting
+  become: true
+  ansible.builtin.command: yum -y update
+  register: update_result
+
+- name: Sync all yum repositories
+  become: true
+  ansible.builtin.command: yum makecache --refresh
+  register: repo_sync_result
+
+- name: Display yum update result
+  debug:
+    msg: "Yum update result: {{ update_result.stdout }}"
+
+- name: Display yum repo sync result
+  debug:
+    msg: "Yum repository sync result: {{ repo_sync_result.stdout }}"
+

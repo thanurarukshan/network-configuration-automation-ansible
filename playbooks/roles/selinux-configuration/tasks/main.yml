@@ -1,0 +1,21 @@
+---
+# tasks/main.yml
+
+- name: Install SELinux utilities package (if missing)
+  ansible.builtin.package:
+    name: libselinux-utils
+    state: present
+
+- name: Set SELinux mode temporarily
+  ansible.builtin.command: "setenforce {{ '1' if selinux_status | lower == 'enforcing' else '0' }}"
+  when: selinux_status in ['enforcing', 'permissive']
+  ignore_errors: yes
+
+- name: Ensure SELinux status persists across reboots
+  ansible.builtin.lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: "SELINUX={{ selinux_status | lower }}"
+    state: present
+  notify: Reboot system if required
+

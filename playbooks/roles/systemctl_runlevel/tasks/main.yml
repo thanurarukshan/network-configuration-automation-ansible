@@ -1,0 +1,17 @@
+---
+# tasks file for systemctl_runlevel
+
+- name: Check the current default systemd target
+  command: systemctl get-default
+  register: current_target
+
+- name: Change systemctl target if not already set
+  when: current_target.stdout != systemctl_target
+  become: true
+  command: systemctl set-default "{{ systemctl_target }}"
+
+- name: Isolate the new systemctl target (apply immediately)
+  when: current_target.stdout != systemctl_target
+  become: true
+  command: systemctl isolate "{{ systemctl_target }}"
+

@@ -1,0 +1,12 @@
+# /playbooks/roles/chrony_config/templates/chrony.conf.j2
+
+# Use NTP servers defined in vars/main.yml
+{% for server in chrony_servers %}
+server {{ server }} iburst
+{% endfor %}
+
+driftfile /var/lib/chrony/drift
+makestep 1.0 3
+rtcsync
+logdir /var/log/chrony
+

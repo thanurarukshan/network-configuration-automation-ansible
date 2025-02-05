@@ -1,0 +1,40 @@
+---
+# tasks file for chrony_config
+- name: Install chrony
+  become: true
+  ansible.builtin.yum:
+    name: chrony
+    state: present
+
+- name: Configure chrony with NTP servers
+  become: true
+  ansible.builtin.template:
+    src: chrony.conf.j2
+    dest: /etc/chrony.conf
+    mode: '0644'
+
+- name: Enable and start chronyd service
+  become: true
+  ansible.builtin.systemd:
+    name: chronyd
+    enabled: true
+    state: started
+
+- name: Set the correct time zone
+  become: true
+  ansible.builtin.command:
+    cmd: timedatectl set-timezone {{ timezone }}
+
+- name: Verify time zone
+  debug:
+    msg: "The system time zone is now set to {{ timezone }}"
+
+- name: Verify chronyd status
+  become: true
+  ansible.builtin.command: systemctl status chronyd
+  register: chronyd_status
+
+- name: Display chronyd status
+  debug:
+    var: chronyd_status.stdout
+

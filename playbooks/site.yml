@@ -20,18 +20,27 @@
   roles:
     #- server-partitioning
 
+- name: Setup Monitoring
+  hosts: all
+  become: yes
+  roles:
+    #- grafana
+    #- node_exporter
+    #- prometheus_installation
+    #- snmp_notifier
+
+- name: OS Configurations
+  hosts: all
+  become: yes
+  roles:
+    #- chrony_config
+    #- selinux-configuration 
+    #- systemctl_runlevel
+    #- yum_update_and_sync
+
 - name: Scan the server
   hosts: all
   become: yes
   roles:
     #- scan
-
-- name: Setup Monitoring
-  hosts: all
-  become: yes
-  roles:
-    - grafana
-    - node_exporter
-    - prometheus_installation
-    - snmp_notifier
 

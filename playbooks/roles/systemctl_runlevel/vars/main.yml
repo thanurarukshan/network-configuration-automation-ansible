@@ -1,0 +1,15 @@
+---
+# vars file for systemctl_runlevel
+systemctl_target: graphical.target   # Default value, can be overwritten
+
+# Valid values for systemctl_target:
+# - rescue.target         # Equivalent to runlevel 1 (Single-user mode for maintenance)
+# - multi-user.target     # Equivalent to runlevel 3 (Multi-user mode without graphical interface)
+# - graphical.target      # Equivalent to runlevel 5 (Multi-user mode with graphical interface)
+# - reboot.target         # Reboot the system (Equivalent to runlevel 6)
+# - poweroff.target       # Shut down the system (Equivalent to runlevel 0)
+# - emergency.target      # Emergency shell (maintenance mode, more limited than rescue mode)
+# - halt.target           # Halt the system (Equivalent to runlevel 0, no power off)
+# - initrd.target         # Initial RAM disk target
+# - shutdown.target       # Target to shut down the system, similar to poweroff
+

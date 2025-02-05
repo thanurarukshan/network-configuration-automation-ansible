@@ -1,0 +1,5 @@
+---
+# vars file for selinux-configuration
+# vars/main.yml
+selinux_status: enforcing  # Options: enforcing, permissive, disabled
+

@@ -1,0 +1,7 @@
+---
+# handlers file for selinux-configuration
+# handlers/main.yml
+- name: Reboot system if required
+  ansible.builtin.reboot:
+  when: selinux_status == "disabled"
+
