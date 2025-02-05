@@ -1,0 +1,109 @@
+---
+- name: Install necessary packages (lvm2, xfsprogs)
+  package:
+    name:
+      - lvm2
+      - xfsprogs
+    state: present
+  become: yes
+
+- name: Ensure the disk is available
+  command: lsblk -d -n -o NAME
+  register: lsblk_output
+  become: yes
+
+- name: Debug lsblk output (Optional for debugging)
+  debug:
+    var: lsblk_output.stdout_lines
+
+- name: Fail if disk is not found
+  fail:
+    msg: "The specified disk {{ disk_device }} does not exist."
+  when: disk_device | basename not in lsblk_output.stdout_lines
+
+- name: Create Physical Volume
+  command: pvcreate {{ disk_device }}
+  become: yes
+  register: pvcreate_result
+  ignore_errors: yes
+
+- name: Fail if Physical Volume creation fails
+  fail:
+    msg: "Failed to create Physical Volume on {{ disk_device }}."
+  when: pvcreate_result.rc != 0
+
+- name: Create Volume Group
+  command: vgcreate seylan {{ disk_device }}
+  become: yes
+
+- name: Create Logical Volumes
+  with_items: "{{ disk_volumes }}"
+  command: >
+    lvcreate --yes -n {{ item.name }} -L {{ item.size }} seylan
+  when: item.is_tmpfs is not defined or not item.is_tmpfs
+  become: yes
+
+- name: Verify Logical Volumes
+  command: lvs
+  become: yes
+
+- name: Format Logical Volumes with XFS
+  with_items: "{{ disk_volumes }}"
+  command: mkfs.xfs -f /dev/mapper/seylan-{{ item.name }}
+  when: item.mount_point != "swap" and (item.is_tmpfs is not defined or not item.is_tmpfs)
+  become: yes
+
+- name: Create Mount Points
+  file:
+    path: "{{ item.mount_point }}"
+    state: directory
+  with_items: "{{ disk_volumes }}"
+  when: item.mount_point != "swap"
+  become: yes
+
+- name: Get UUIDs of Logical Volumes
+  command: blkid /dev/mapper/seylan-{{ item.name }} -s UUID -o value
+  with_items: "{{ disk_volumes }}"
+  register: blkid_output
+  when: item.name not in ['lv_swap', 'lv_tmp']
+  become: yes
+
+- name: Debug blkid_output (Optional for debugging)
+  debug:
+    msg: "UUID for {{ item.item.name }} is {{ item.stdout }}"
+  with_items: "{{ blkid_output.results }}"
+  
+- name: Add Logical Volumes to /etc/fstab using UUIDs
+  lineinfile:
+    path: /etc/fstab
+    line: "UUID={{ item.stdout }} {{ item.item.mount_point }} xfs defaults 0 2"
+    state: present
+  when: item.stdout is defined and item.stdout != ''
+  with_items: "{{ blkid_output.results }}"
+
+- name: Reload systemd to apply changes
+  command: systemctl daemon-reload
+  become: yes
+    
+- name: Create Mount Points
+  file:
+    path: "{{ item.mount_point }}"
+    state: directory
+  with_items: "{{ disk_volumes }}"
+  when: item.mount_point != "swap"
+  become: yes
+
+- name: Mount all filesystems using Ansible mount module
+  mount:
+    path: "{{ item.mount_point }}"
+    src: "/dev/mapper/seylan-{{ item.name }}"
+    fstype: xfs
+    state: mounted
+  with_items: "{{ disk_volumes }}"
+  when: item.mount_point != "swap"
+  become: yes
+
+- name: Verify Mounted Filesystems
+  command: df -h
+  become: yes
+

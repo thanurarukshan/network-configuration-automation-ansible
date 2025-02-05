@@ -1,0 +1,21 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "test",
+    "title": "Test Dashboard",
+    "tags": [],
+    "timezone": "browser",
+    "editable": true,
+    "panels": [],
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "refresh": "5s",
+    "schemaVersion": 17,
+    "version": 0,
+    "links": []
+  },
+  "overwrite": true
+}
+

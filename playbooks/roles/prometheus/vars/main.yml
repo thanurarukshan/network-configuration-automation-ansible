@@ -1,0 +1,25 @@
+prometheus_version: "2.43.0"
+prometheus_install_dir: "/hms/installs/prometheus"
+prometheus_config_dir: "/etc/prometheus"
+prometheus_data_dir: "/var/lib/prometheus"
+
+# Prometheus configuration variables
+prometheus_config_path: /etc/prometheus/prometheus.yml
+alert_rules_path: /etc/prometheus/alert_rules.yml
+
+# Node Exporter configuration
+node_exporter_port: 9100
+node_exporter_host: localhost
+
+# Template Manager configuration
+template_manager_port: 10003
+template_manager_host: 127.0.0.1
+
+# SNMP Notifier configuration
+snmp_notifier_port: 9464
+snmp_notifier_host: localhost
+
+# Alertmanager configuration
+alertmanager_host: localhost
+alertmanager_port: 9093
+

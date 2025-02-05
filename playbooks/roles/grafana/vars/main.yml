@@ -1,0 +1,9 @@
+grafana_repo_url: "https://packages.grafana.com/oss/rpm"
+grafana_repo_gpgkey: "https://packages.grafana.com/gpg.key"
+# In vars/main.yml or inventory file
+grafana_user: "admin"
+grafana_password: "admin"
+grafana_port: 3000
+grafana_url: "http://localhost:{{ grafana_port }}"
+grafana_credentials: "admin:admin"
+

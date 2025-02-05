@@ -1,0 +1,52 @@
+groups:
+- name: template_manager_alerts
+  rules:
+  - alert: TemplateManagerDownAlert
+    expr: up{job="template-manager-server"} == 0
+    for: 15s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Template Manager Server is Down"
+      description: "The Template Manager server at {{ template_manager_host }}:{{ template_manager_port }} is unreachable."
+
+- name: TargetAlerts
+  rules:
+  - alert: TargetDown
+    expr: up == 0
+    for: 15s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Target is down"
+      description: "Target has been down for more than 2 minutes."
+
+- name: system_alerts
+  rules:
+    - alert: HighCpuUsage
+      expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 20
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High CPU Usage"
+        description: "CPU usage is above 80% for more than 5 minutes."
+
+    - alert: HighMemoryUsage
+      expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 5
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High Memory Usage"
+        description: "Memory usage is above 90% for more than 5 minutes."
+
+    - alert: LowDiskSpace
+      expr: node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} * 100 < 10
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Low Disk Space"
+        description: "Disk space is below 10% on root filesystem."
+

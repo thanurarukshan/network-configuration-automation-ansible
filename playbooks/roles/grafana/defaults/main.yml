@@ -1,0 +1,9 @@
+grafana_version: "9.5.2"
+grafana_install_dir: "/usr/share/grafana"
+grafana_service_name: "grafana-server"
+grafana_port: 3000
+grafana_user: "admin"
+grafana_password: "admin"
+prometheus_url: "http://localhost:9090"
+grafana_credentials: "admin:admin"
+

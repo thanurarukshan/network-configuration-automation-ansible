@@ -1,0 +1,87 @@
+- name: Check if SNMP Notifier is already installed
+  ansible.builtin.stat:
+    path: "{{ snmp_notifier_install_dir }}"
+  register: snmp_notifier_installed
+
+- name: Remove existing SNMP Notifier installation
+  ansible.builtin.file:
+    path: "{{ snmp_notifier_install_dir }}"
+    state: absent
+  when: snmp_notifier_installed.stat.exists
+
+- name: Remove existing SNMP Notifier configuration directory
+  ansible.builtin.file:
+    path: "{{ snmp_notifier_config_dir }}"
+    state: absent
+  when: snmp_notifier_installed.stat.exists
+
+- name: Ensure SNMP Notifier group exists
+  ansible.builtin.group:
+    name: "{{ snmp_notifier_group }}"
+    state: present
+
+- name: Ensure SNMP Notifier user exists
+  ansible.builtin.user:
+    name: "{{ snmp_notifier_user }}"
+    group: "{{ snmp_notifier_group }}"
+    shell: /sbin/nologin
+    create_home: no
+    state: present
+
+- name: Ensure SNMP Notifier install directory exists
+  ansible.builtin.file:
+    path: "{{ snmp_notifier_install_dir }}"
+    state: directory
+    owner: "{{ snmp_notifier_user }}"
+    group: "{{ snmp_notifier_group }}"
+    mode: '0755'
+
+# Updated URL example
+- name: Download SNMP Notifier
+  ansible.builtin.get_url:
+    url: "https://github.com/maxwo/snmp_notifier/releases/download/v1.5.0/snmp_notifier-1.5.0.linux-amd64.tar.gz"
+    dest: /tmp/snmp_notifier.tar.gz
+
+- name: Extract SNMP Notifier
+  ansible.builtin.unarchive:
+    src: /tmp/snmp_notifier.tar.gz
+    dest: "{{ snmp_notifier_install_dir }}"
+    remote_src: yes
+    extra_opts:
+      - "--strip-components=1"
+
+- name: Create SNMP Notifier config directory
+  ansible.builtin.file:
+    path: "{{ snmp_notifier_config_dir }}"
+    state: directory
+    owner: "{{ snmp_notifier_user }}"
+    group: "{{ snmp_notifier_group }}"
+    mode: '0755'
+
+- name: Deploy SNMP Notifier configuration
+  ansible.builtin.template:
+    src: templates/snmp.yml.j2
+    dest: "{{ snmp_notifier_config_dir }}/snmp_notifier.yml"
+    owner: "{{ snmp_notifier_user }}"
+    group: "{{ snmp_notifier_group }}"
+    mode: '0644'
+
+- name: Deploy SNMP Notifier service file
+  ansible.builtin.template:
+    src: templates/snmp_notifier.service.j2
+    dest: /etc/systemd/system/snmp_notifier.service
+    mode: '0644'
+  notify:
+    - Reload systemd
+
+- name: Enable and start SNMP Notifier service
+  ansible.builtin.systemd:
+    name: snmp_notifier
+    state: started
+    enabled: yes
+
+# Handlers
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: yes
+

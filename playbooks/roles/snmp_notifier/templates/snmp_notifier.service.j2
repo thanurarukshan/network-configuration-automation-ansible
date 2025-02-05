@@ -1,0 +1,16 @@
+[Unit]
+Description=SNMP Notifier Service
+After=network.target
+
+[Service]
+Type=simple
+User=snmp_notifier
+ExecStart=/usr/local/bin/snmp_notifier/snmp_notifier \
+  --web.listen-address=:9464 \
+  --snmp.destination=127.0.0.1:162 \
+  --snmp.trap-description-template=/etc/snmp/description-template.tpl \
+  --log.level=debug
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

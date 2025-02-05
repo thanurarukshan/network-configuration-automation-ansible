@@ -1,0 +1,110 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "system-alerts-dashboard",
+    "title": "System Alerts Dashboard",
+    "tags": [],
+    "timezone": "browser",
+    "editable": true,
+    "graphTooltip": 1,
+    "panels": [
+      {
+        "type": "singlestat",
+        "title": "High CPU Usage",
+        "gridPos": {
+          "h": 5,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "targets": [
+          {
+            "expr": "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+            "refId": "A"
+          }
+        ],
+        "datasource": "Prometheus",
+        "format": "percent",
+        "valueName": "current",
+        "thresholds": "20,80",
+        "colorBackground": true,
+        "colors": [
+          "green",
+          "orange",
+          "red"
+        ]
+      },
+      {
+        "type": "singlestat",
+        "title": "High Memory Usage",
+        "gridPos": {
+          "h": 5,
+          "w": 24,
+          "x": 0,
+          "y": 5
+        },
+        "targets": [
+          {
+            "expr": "(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100",
+            "refId": "A"
+          }
+        ],
+        "datasource": "Prometheus",
+        "format": "percent",
+        "valueName": "current",
+        "thresholds": "70,90",
+        "colorBackground": true,
+        "colors": [
+          "green",
+          "orange",
+          "red"
+        ]
+      },
+      {
+        "type": "singlestat",
+        "title": "Low Disk Space",
+        "gridPos": {
+          "h": 5,
+          "w": 24,
+          "x": 0,
+          "y": 10
+        },
+        "targets": [
+          {
+            "expr": "node_filesystem_avail_bytes{mountpoint=\"/\"} / node_filesystem_size_bytes{mountpoint=\"/\"} * 100",
+            "refId": "A"
+          }
+        ],
+        "datasource": "Prometheus",
+        "format": "percent",
+        "valueName": "current",
+        "thresholds": "10,20",
+        "colorBackground": true,
+        "colors": [
+          "red",
+          "orange",
+          "green"
+        ]
+      }
+    ],
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "timepicker": {
+      "refresh_intervals": []
+    },
+    "templating": {
+      "list": []
+    },
+    "annotations": {
+      "list": []
+    },
+    "refresh": "5s",
+    "schemaVersion": 17,
+    "version": 1,
+    "links": []
+  },
+  "overwrite": true
+}
+

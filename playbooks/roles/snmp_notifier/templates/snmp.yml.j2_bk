@@ -1,0 +1,6 @@
+# SNMP Notifier Configuration
+web:
+  listen-address: ":9464"
+snmp:
+  destination: "127.0.0.1:162"
+

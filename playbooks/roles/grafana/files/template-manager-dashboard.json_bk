@@ -1,0 +1,127 @@
+{
+  "id": null,
+  "uid": "template-manager-dashboard",
+  "title": "Template Manager Dashboard",
+  "tags": [],
+  "timezone": "browser",
+  "editable": true,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "type": "singlestat",
+      "title": "Template Manager Server Status",
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "up{job=\"template-manager-server\"}",
+          "refId": "A"
+        }
+      ],
+      "datasource": "Prometheus",
+      "format": "short",
+      "valueName": "current",
+      "thresholds": "0.5,1",
+      "colorBackground": true,
+      "colors": [
+        "red",
+        "green",
+        "green"
+      ],
+      "sparkline": {
+        "show": true
+      },
+      "gauge": {
+        "show": true
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Template Manager Server Availability",
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 3
+      },
+      "targets": [
+        {
+          "expr": "up{job=\"template-manager-server\"}",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "datasource": "Prometheus",
+      "xaxis": {
+        "mode": "time"
+      },
+      "yaxis": {
+        "format": "short",
+        "label": "Status",
+        "logBase": 1,
+        "min": "0",
+        "max": "1"
+      },
+      "lines": true,
+      "linewidth": 2,
+      "fill": 1,
+      "stack": false,
+      "alert": {
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                0
+              ],
+              "type": "lt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "5m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "frequency": "60s",
+        "handler": 1,
+        "message": "Template Manager Server is down",
+        "name": "TemplateManagerDownAlert",
+        "noDataState": "no_data",
+        "notifications": []
+      }
+    }
+  ],
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": []
+  },
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  },
+  "refresh": "5s",
+  "schemaVersion": 17,
+  "version": 1,
+  "links": []
+}
+

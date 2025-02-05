@@ -1,0 +1,29 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['localhost:9093']  # Update this if Alertmanager is running on a different host or port
+
+scrape_configs:
+  - job_name: 'template-manager-server'
+    static_configs:
+      - targets: ['127.0.0.1:10003']
+
+  - job_name: 'snmp_notifier'
+    static_configs:
+      - targets: ['localhost:9464']
+
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['localhost:9100']  # Default port for Node Exporter
+
+  # Add more scrape configurations here if needed
+  # Example for scraping other services:
+  # - job_name: 'my_service'
+  #   static_configs:
+  #     - targets: ['localhost:8080']
+rule_files:
+  - '/etc/prometheus/alert_rules.yml'

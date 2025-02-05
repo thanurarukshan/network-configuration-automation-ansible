@@ -1,0 +1,52 @@
+# tasks/main.yml
+- name: Create Node Exporter user
+  ansible.builtin.user:
+    name: "{{ node_exporter_user }}"
+    shell: /sbin/nologin
+
+- name: Download Node Exporter
+  ansible.builtin.get_url:
+    url: "{{ node_exporter_url }}"
+    dest: "/tmp/node_exporter.tar.gz"
+
+- name: Extract Node Exporter binary
+  ansible.builtin.unarchive:
+    src: "/tmp/node_exporter.tar.gz"
+    dest: "/usr/local/bin/"
+    remote_src: yes
+    extra_opts: [ "--strip-components=1" ]
+
+- name: Ensure Node Exporter install directory exists
+  ansible.builtin.file:
+    path: "{{ node_exporter_install_dir }}"
+    state: directory
+    owner: "{{ node_exporter_user }}"
+    group: "{{ node_exporter_group }}"
+    mode: '0755'
+
+- name: Create Node Exporter data directory
+  ansible.builtin.file:
+    path: "{{ node_exporter_data_dir }}"
+    state: directory
+    owner: "{{ node_exporter_user }}"
+    group: "{{ node_exporter_group }}"
+    mode: '0755'
+
+- name: Deploy Node Exporter systemd service file
+  ansible.builtin.template:
+    src: "node_exporter.service.j2"
+    dest: "/etc/systemd/system/{{ node_exporter_service_name }}.service"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Enable and start Node Exporter service
+  ansible.builtin.systemd:
+    name: "{{ node_exporter_service_name }}"
+    state: started
+    enabled: yes
+

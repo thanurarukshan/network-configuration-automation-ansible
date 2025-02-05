@@ -1,0 +1,10 @@
+# Note: mentioned disk should be in just attached (unmounted) status
+# This Ansible role will automatically create mount points, so do not need to pre-create
+# Caution: If the script fails, check the etc/fstab output before restart the system
+---
+disk_device: "/dev/vdb"  # Specify which disk to partition
+
+disk_volumes:
+  - { name: "installs", size: 1G, mount_point: "/installs" }
+  - { name: "log", size: 1G, mount_point: "/log" }
+  - { name: "backup", size: 2G, mount_point: "/backup" }

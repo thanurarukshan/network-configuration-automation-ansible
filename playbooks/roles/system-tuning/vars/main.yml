@@ -4,5 +4,5 @@ sysctl_settings:
   - name: net.ipv4.ip_forward
     value: 1
   - name: vm.swappiness
-    value: 10
+    value: 40
 

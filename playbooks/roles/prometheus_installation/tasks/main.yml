@@ -1,0 +1,141 @@
+---
+# tasks file for prometheus_installation
+# by: Thanura Rukshan
+
+- name: Check if Prometheus is already installed
+  ansible.builtin.stat:
+    path: "{{ prometheus_install_dir }}"
+  register: prometheus_installed
+  ignore_errors: yes
+
+- name: Remove existing Prometheus installation
+  ansible.builtin.file:
+    path: "{{ prometheus_install_dir }}"
+    state: absent
+  when: prometheus_installed.stat.exists
+  ignore_errors: yes
+
+- name: Remove existing Prometheus configuration directory
+  ansible.builtin.file:
+    path: "{{ prometheus_config_dir }}"
+    state: absent
+  when: prometheus_installed.stat.exists
+  ignore_errors: yes
+
+# end 
+- name: Ensure Prometheus installation directory exists
+  file:
+    path: "{{ prometheus_install_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Download Prometheus binary
+  get_url:
+    url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-amd64.tar.gz"
+    dest: "/tmp/prometheus-{{ prometheus_version }}.tar.gz"
+    mode: '0644'
+
+- name: Extract Prometheus
+  unarchive:
+    src: "/tmp/prometheus-{{ prometheus_version }}.tar.gz"
+    dest: "{{ prometheus_install_dir }}"
+    remote_src: yes
+    creates: "{{ prometheus_install_dir }}/prometheus"
+
+#- name: Move Prometheus binaries to /usr/local/bin
+#  copy:
+#    src: "{{ prometheus_install_dir }}/prometheus-{{ prometheus_version }}.linux-amd64/prometheus"
+#    dest: /usr/local/bin/prometheus
+#    mode: '0755'
+#    remote_src: yes
+
+- name: Check if Prometheus binary exists
+  stat:
+    path: "{{ prometheus_install_dir }}/prometheus-{{ prometheus_version }}.linux-amd64/prometheus"
+  register: prometheus_binary
+
+- name: Move Prometheus binaries to /usr/local/bin
+  copy:
+    src: "{{ prometheus_install_dir }}/prometheus-{{ prometheus_version }}.linux-amd64/prometheus"
+    dest: /usr/local/bin/prometheus
+    mode: '0755'
+    remote_src: yes
+  when: prometheus_binary.stat.exists
+
+- name: Notify if Prometheus binary was not found
+  debug:
+    msg: "Prometheus binary not found, skipping the move step."
+  when: not prometheus_binary.stat.exists
+
+- name: Move Prometheus config to /usr/local/bin
+  copy:
+    src: "{{ prometheus_install_dir }}/prometheus-{{ prometheus_version }}.linux-amd64/promtool"
+    dest: /usr/local/bin/promtool
+    mode: '0755'
+    remote_src: yes
+
+- name: Ensure Prometheus configuration directory exists
+  file:
+    path: "{{ prometheus_config_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Create Prometheus configuration file
+  template:
+    src: prometheus.yml.j2
+    dest: "{{ prometheus_config_path }}"
+    mode: '0644'
+
+- name: Create prometheus user and group
+  user:
+    name: prometheus
+    system: yes
+    shell: /sbin/nologin
+    home: /var/lib/prometheus
+
+- name: Ensure Prometheus data directory exists
+  file:
+    path: "{{ prometheus_data_dir }}"
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+
+- name: Create Prometheus data directory
+  file:
+    path: "{{ prometheus_data_dir }}"
+    state: directory
+    owner: prometheus
+    group: prometheus
+    mode: '0755'
+
+#- name: Create a systemd service for Prometheus
+#  template:
+#    src: prometheus.service.j2
+#    dest: /etc/systemd/system/prometheus.service
+#    mode: '0644'
+
+- name: Create a systemd service for Prometheus
+  template:
+    src: prometheus.service.j2
+    dest: /etc/systemd/system/prometheus.service
+    mode: '0644'
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+
+- name: Enable Prometheus service
+  systemd:
+    name: prometheus
+    enabled: yes
+
+- name: Start Prometheus service
+  systemd:
+    name: prometheus
+    state: started
+

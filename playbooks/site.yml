@@ -4,12 +4,34 @@
   roles:
     - connectivity-test
 
-- name: Configure Network on Linux
+- name: Configure Network
   hosts: all
   become: yes
   roles:
     #- network-configuration-set
-    - user-management
-    #- package-management
+    #- user-management
+    #- package-management 
     #- system-tuning
     #- monitoring
+
+- name: Disk Partitioning
+  hosts: all
+  become: yes
+  roles:
+    #- server-partitioning
+
+- name: Scan the server
+  hosts: all
+  become: yes
+  roles:
+    #- scan
+
+- name: Setup Monitoring
+  hosts: all
+  become: yes
+  roles:
+    - grafana
+    - node_exporter
+    - prometheus_installation
+    - snmp_notifier
+

@@ -1,0 +1,4 @@
+---
+- include_tasks: grafana_setup.yml
+- include_tasks: setup_dash.yml
+  #- include_tasks: backup.yml

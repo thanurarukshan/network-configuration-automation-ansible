@@ -1,0 +1,105 @@
+---
+- name: Stop the Grafana service
+  systemd:
+    name: grafana-server
+    state: stopped
+    enabled: no
+  ignore_errors: yes
+
+- name: Remove Grafana package
+  yum:
+    name: grafana
+    state: absent
+  ignore_errors: yes
+
+- name: Remove Grafana configuration and data directories
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /etc/grafana
+    - /var/lib/grafana
+    - /var/log/grafana
+  ignore_errors: yes
+
+- name: Remove Grafana user and group
+  user:
+    name: grafana
+    state: absent
+  ignore_errors: yes
+
+- name: Remove Grafana service file
+  file:
+    path: /usr/lib/systemd/system/grafana-server.service
+    state: absent
+  ignore_errors: yes
+
+- name: Clean up any residual files in /usr/share/grafana
+  file:
+    path: /usr/share/grafana
+    state: absent
+  ignore_errors: yes
+
+- name: Ensure /tmp is clean of Grafana tarballs
+  file:
+    path: /tmp/grafana*.tar.gz
+    state: absent
+  ignore_errors: yes
+
+    # Installation    
+
+- name: Install Grafana package
+  yum:
+    name: grafana
+    state: present
+
+- name: Start and enable Grafana service
+  systemd:
+    name: grafana-server
+    state: started
+    enabled: yes
+
+- name: Ensure Grafana service is running
+  systemd:
+    name: grafana-server
+    state: started
+
+- name: Verify Grafana service status
+  command: systemctl status grafana-server
+  register: grafana_status
+  changed_when: false
+
+- name: Print Grafana service status
+  debug:
+    msg: "{{ grafana_status.stdout }}"
+
+- name: Base64 encode Grafana credentials
+  set_fact:
+    grafana_credentials: "{{ grafana_user | string + ':' + grafana_password | string | b64encode }}"
+
+- name: Configure Prometheus as a Grafana data source
+  uri:
+    url: "http://localhost:{{ grafana_port }}/api/datasources"
+    method: POST
+    headers:
+      Authorization: "Basic {{ grafana_credentials }}"
+      Content-Type: "application/json"
+    body: "{{ lookup('template', 'prometheus_datasource.json.j2') | to_json }}"
+    status_code: [200, 409]
+    validate_certs: no
+  register: grafana_response
+  failed_when: grafana_response.status == -1
+
+- debug:
+    var: grafana_response
+
+
+- name: Debug credentials
+  debug:
+    msg: "User: {{ grafana_user }}, Password: {{ grafana_password }}"
+
+- name: Debug Prometheus datasource JSON
+  debug:
+    msg: "{{ lookup('template', 'prometheus_datasource.json.j2') }}"
+
+

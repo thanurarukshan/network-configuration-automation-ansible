@@ -1,0 +1,7 @@
+snmp_notifier_version: "0.6.0"
+snmp_notifier_install_dir: "/usr/local/bin/snmp_notifier"
+snmp_notifier_config_dir: "/etc/snmp"
+snmp_notifier_user: "snmp_notifier"
+snmp_notifier_group: "snmp_notifier"
+
+

@@ -1,0 +1,52 @@
+- name: Load the Grafana dashboard JSON
+  set_fact:
+    grafana_dashboard_json: "{{ lookup('file', 'roles/grafana/files/template-manager-dashboard.json') | from_json }}"
+- name: Set Grafana credentials
+  set_fact:
+    grafana_credentials: "YWRtaW46YWRtaW4="
+
+- name: Deploy Grafana dashboard
+  uri:
+    url: "http://localhost:3000/api/dashboards/db"
+    method: POST
+    headers:
+      Authorization: "Basic {{ grafana_credentials }}"
+      Content-Type: "application/json"
+    body: "{{ grafana_dashboard_json | to_json }}"
+    status_code: [200, 409]
+    validate_certs: no
+    return_content: yes
+  register: grafana_dashboard_response
+
+- name: Debug Grafana response
+  debug:
+    msg: "{{ grafana_dashboard_response }}"
+
+
+- name: Debug full response from Grafana
+  debug:
+    msg: "{{ grafana_dashboard_response }}"
+
+- name: Load the Grafana system dashboard JSON
+  set_fact:
+    grafana_system_dashboard_json: "{{ lookup('file', 'roles/grafana/files/system-alerts-dashboard.json') | from_json }}"
+- name: Set Grafana credentials
+  set_fact:
+    grafana_credentials: "YWRtaW46YWRtaW4="
+  
+- name: Deploy Grafana system dashboard
+  uri:
+    url: "http://localhost:3000/api/dashboards/db"
+    method: POST
+    headers:
+      Authorization: "Basic {{ grafana_credentials }}"
+      Content-Type: "application/json"
+    body: "{{ grafana_system_dashboard_json | to_json }}"
+    status_code: [200, 409]
+    validate_certs: no
+    return_content: yes
+  register: grafana_system_dashboard_response
+
+- name: Debug Grafana system response
+  debug:
+    msg: "{{ grafana_system_dashboard_response }}"

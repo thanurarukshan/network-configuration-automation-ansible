@@ -1,0 +1,22 @@
+groups:
+- name: template_manager_alerts
+  rules:
+  - alert: TemplateManagerDownAlert
+    expr: up{job="template-manager-server"} == 0
+    for: 0m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Template Manager Server is Up"
+      description: "The Template Manager server at 127.0.0.1:10003 is reachable."
+
+- name: TargetAlerts
+  rules:
+  - alert: TargetDown
+    expr: up == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Target {{ '{{' }} $labels.instance {{ '}}' }} is down"
+      description: "Target {{ '{{' }} $labels.instance {{ '}}' }} has been down for more than 5 minutes."
