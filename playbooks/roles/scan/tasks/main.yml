@@ -1,2 +1,69 @@
----
-# tasks file for scan
+# tasks/main.yml
+
+- name: Ensure scan_reports directory exists
+  ansible.builtin.file:
+    path: "{{ scan_reports_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Gather system and configuration information
+  ansible.builtin.shell: |
+    echo "====== Configuration Scan Report ======" > /tmp/scan_report.txt
+    echo "Hostname: $(hostname)" >> /tmp/scan_report.txt
+    echo "IP Address: $(hostname -I | awk '{print $1}')" >> /tmp/scan_report.txt
+    echo "Date: $(date)" >> /tmp/scan_report.txt
+    echo "---------------------------------------" >> /tmp/scan_report.txt
+    
+    # Connectivity Test
+    echo "== Connectivity Test ==" >> /tmp/scan_report.txt
+    ping -c 3 google.com &>/dev/null && echo "Internet: Reachable" || echo "Internet: Not Reachable" >> /tmp/scan_report.txt
+
+    # Network Configuration
+    echo "== Network Configuration ==" >> /tmp/scan_report.txt
+    ip a >> /tmp/scan_report.txt
+
+    # Installed Packages
+    echo "== Installed Packages ==" >> /tmp/scan_report.txt
+    rpm -qa | sort >> /tmp/scan_report.txt
+
+    # SELinux Status
+    echo "== SELinux Status ==" >> /tmp/scan_report.txt
+    sestatus >> /tmp/scan_report.txt
+
+    # System Runlevel
+    echo "== System Runlevel ==" >> /tmp/scan_report.txt
+    systemctl get-default >> /tmp/scan_report.txt
+
+    # Mounted Partitions
+    echo "== Mounted Partitions ==" >> /tmp/scan_report.txt
+    df -h >> /tmp/scan_report.txt
+
+    # Chrony Sync Status
+    echo "== Chrony Sync Status ==" >> /tmp/scan_report.txt
+    chronyc tracking >> /tmp/scan_report.txt
+
+    # Monitoring Services
+    echo "== Monitoring Services ==" >> /tmp/scan_report.txt
+    systemctl is-active grafana-server >> /tmp/scan_report.txt
+    systemctl is-active prometheus >> /tmp/scan_report.txt
+    systemctl is-active node_exporter >> /tmp/scan_report.txt
+
+    # Metadata Footer
+    echo "---------------------------------------" >> /tmp/scan_report.txt
+    echo "All rights reserved" >> /tmp/scan_report.txt
+    echo "Written by Thanura Rukshan" >> /tmp/scan_report.txt
+  register: scan_output
+  changed_when: false
+
+- name: Save scan report to scan_reports directory
+  ansible.builtin.copy:
+    src: /tmp/scan_report.txt
+    dest: "{{ scan_reports_dir }}/ConfigurationScan-{{ ansible_default_ipv4.address }}-{{ ansible_date_time.date }}-{{ ansible_date_time.time }}.txt"
+    remote_src: yes
+    mode: '0644'
+
+- name: Remove temporary scan report file
+  ansible.builtin.file:
+    path: /tmp/scan_report.txt
+    state: absent
+

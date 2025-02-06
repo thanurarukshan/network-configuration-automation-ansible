@@ -1,2 +1,4 @@
 ---
 # vars file for scan
+scan_reports_dir: "/var/log/scan_reports"
+
