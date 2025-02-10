@@ -49,7 +49,7 @@ network-configuration-automation-ansible/
 ## Installation
 Clone the repository:
 ```sh
-git clone https://github.com/yourusername/network-configuration-automation-ansible.git
+git clone https://github.com/thanurarukshan/network-configuration-automation-ansible.git
 ```
 
 Navigate into the project directory:
