@@ -6,56 +6,87 @@
     <title>Ansible Network Configuration Automation Playbook</title>
     <style>
         body {
+            background-color: black;
+            color: white;
             font-family: Arial, sans-serif;
-            margin: 40px;
             line-height: 1.6;
+            margin: 20px;
         }
         h1, h2, h3 {
-            color: #333;
-        }
-        pre {
-            background: #f4f4f4;
-            padding: 10px;
-            border-left: 5px solid #333;
-            overflow-x: auto;
+            color: #ffffff;
         }
         code {
+            background-color: #333;
+            padding: 2px 5px;
+            border-radius: 3px;
             font-family: monospace;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
+        pre {
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            border-bottom: 2px solid #ffffff;
+            padding-bottom: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Ansible Network Configuration Automation Playbook</h1>
-        <p><strong>By Thanura Rukshan</strong></p>
-        <h2>Overview</h2>
-        <p>This documentation provides a detailed guide on automating network configurations using Ansible.</p>
+    <h1>Ansible Network Configuration Automation Playbook by Thanura Rukshan</h1>
 
+    <div class="section">
+        <h2>Documentation</h2>
+        <h3>Overview</h3>
+        <p>This documentation provides a detailed guide on the Network Configuration Automation playbook using Ansible. The playbook is designed to automate server configurations, including network setup, package management, system tuning, monitoring, disk partitioning, and security enhancements.</p>
+    </div>
+
+    <div class="section">
         <h2>Prerequisites</h2>
-        <ul>
-            <li><strong>Ansible Installation:</strong> Install Ansible on the control node.<br>
+        <p>Before running the playbook, ensure the following:</p>
+        <ol>
+            <li>
+                <strong>Ansible Installation:</strong> Install Ansible on the control node.
                 <pre><code>sudo apt update && sudo apt install ansible -y  # Ubuntu/Debian
 sudo yum install ansible -y  # CentOS/RHEL</code></pre>
             </li>
-            <li><strong>SSH Access:</strong> Ensure SSH access is configured.<br>
+            <li>
+                <strong>SSH Access:</strong> Ensure SSH access to target servers is configured.
                 <pre><code>ssh-copy-id user@target-server</code></pre>
             </li>
-            <li><strong>Sudo Privileges:</strong> The Ansible user should have sudo privileges.</li>
-            <li><strong>Inventory File:</strong> Define target servers in <code>playbooks/dev.ini</code>.</li>
-            <li><strong>Python and Dependencies:</strong> Ensure Python and pip are installed.<br>
+            <li>
+                <strong>Sudo Privileges:</strong> The Ansible user should have sudo privileges.
+            </li>
+            <li>
+                <strong>Inventory File:</strong> Define the target servers in <code>playbooks/dev.ini</code>.
+            </li>
+            <li>
+                <strong>Python and Dependencies:</strong> Ensure Python and required packages (e.g., pip) are installed on the target servers.
                 <pre><code>sudo apt install python3 python3-pip -y</code></pre>
             </li>
-        </ul>
+        </ol>
+    </div>
 
+    <div class="section">
         <h2>Inventory File (playbooks/dev.ini)</h2>
         <pre><code>[all]
 testserver ansible_host=192.168.1.100 ansible_user=admin ansible_ssh_pass=your_password</code></pre>
+    </div>
 
+    <div class="section">
         <h2>Playbook Structure</h2>
+        <h3>File/Folder Structure</h3>
         <pre><code>network-configuration-automation-ansible/
 │── ansible.cfg
 │── playbooks/
@@ -78,28 +109,223 @@ testserver ansible_host=192.168.1.100 ansible_user=admin ansible_ssh_pass=your_p
 │   ├── systemctl_runlevel/
 │   ├── yum_update_and_sync/
 │   ├── scan/</code></pre>
+        <p>The main playbook file is <code>playbooks/site.yml</code>, and it calls the following roles:</p>
+        <pre><code>- name: Test connectivity to target servers
+  hosts: all
+  gather_facts: no
+  roles:
+    - connectivity-test
 
+- name: Configure Network
+  hosts: all
+  become: yes
+  roles:
+    - network-configuration-set
+    - user-management
+    - package-management
+    - system-tuning
+    - monitoring
+
+- name: Disk Partitioning
+  hosts: all
+  become: yes
+  roles:
+    - server-partitioning
+
+- name: Setup Monitoring
+  hosts: all
+  become: yes
+  roles:
+    - grafana
+    - node_exporter
+    - prometheus_installation
+    - snmp_notifier
+
+- name: OS Configurations
+  hosts: all
+  become: yes
+  roles:
+    - chrony_config
+    - selinux-configuration
+    - systemctl_runlevel
+    - yum_update_and_sync
+
+- name: Scan the server
+  hosts: all
+  become: yes
+  roles:
+    - scan</code></pre>
+    </div>
+
+    <div class="section">
+        <h2>Role Descriptions</h2>
+        <p>Each role consists of tasks, variables, and handlers.</p>
+        <h3>1. connectivity-test</h3>
+        <p><strong>Purpose:</strong> Ensures Ansible can reach the target servers.</p>
+        <pre><code>- name: Ping target servers
+  ansible.builtin.ping:</code></pre>
+
+        <h3>2. network-configuration-set</h3>
+        <p><strong>Purpose:</strong> Configures network settings.</p>
+        <pre><code>---
+# vars file for network-configuration-set
+# roles/network-configuration-automation/vars/main.yml
+
+# Network Interface Configuration
+network_interface: eth0  # The network interface to configure (e.g., eth0, ens33)
+
+# IP Configuration
+use_dhcp: true  # Set to false for a static IP configuration
+static_ip: "192.168.1.100"  # Static IP address (if use_dhcp is false)
+netmask: "255.255.255.0"  # Netmask (if use_dhcp is false)
+gateway: "192.168.1.1"  # Default gateway (if use_dhcp is false)
+
+# DNS Configuration
+dns_servers:
+  - "8.8.8.8"
+  - "8.8.4.4"
+
+# Hostname Configuration
+set_hostname: true  # Whether to change the hostname
+hostname: "network-node"  # The desired hostname
+
+# SSH Configuration
+disable_root_login: true  # Disable root login via SSH (true/false)
+ssh_port: 22  # SSH port number (default: 22)
+
+# Firewall Configuration
+firewall_enable: true  # Enable or disable firewall (true/false)
+open_ports:
+  - 22   # Open SSH port
+  - 80   # Open HTTP port
+  - 443  # Open HTTPS port
+
+# NTP Configuration
+enable_ntp: true  # Enable NTP service for time synchronization
+ntp_servers:
+  - "time.google.com"
+  - "time.nist.gov"</code></pre>
+
+        <h3>3. user-management</h3>
+        <p><strong>Purpose:</strong> Creates users on the target servers.</p>
+        <pre><code>users:
+  - name: devops
+    password: "password123"
+  - name: admin
+    password: "adminpassword"</code></pre>
+
+        <h3>4. package-management</h3>
+        <p><strong>Purpose:</strong> Installs necessary software packages.</p>
+        <pre><code>---
+# vars file for package-management
+install_packages:
+  - git
+  - vim
+  - curl
+  - wget
+
+remove_packages:
+  - nmap</code></pre>
+
+        <h3>5. system-tuning</h3>
+        <p><strong>Purpose:</strong> Optimizes system performance.</p>
+        <pre><code>---
+# vars file for system-tuning
+sysctl_settings:
+  - name: net.ipv4.ip_forward
+    value: 1
+  - name: vm.swappiness
+    value: 40</code></pre>
+
+        <h3>6. monitoring</h3>
+        <p><strong>Purpose:</strong> Sets up monitoring tools.</p>
+        <pre><code>- name: Install monitoring tools
+  ansible.builtin.package:
+    name:
+      - netdata
+      - htop
+      - iftop
+    state: present</code></pre>
+
+        <h3>7. server-partitioning</h3>
+        <p><strong>Purpose:</strong> Manages disk partitions.</p>
+        <pre><code># Note: mentioned disk should be in just attached (unmounted) status
+# This Ansible role will automatically create mount points, so do not need to pre-create
+# Caution: If the script fails, check the etc/fstab output before restart the system
+---
+disk_device: "/dev/vdb"  # Specify which disk to partition
+
+disk_volumes:
+  - { name: "installs", size: 1G, mount_point: "/installs" }
+  - { name: "log", size: 1G, mount_point: "/log" }
+  - { name: "backup", size: 2G, mount_point: "/backup" }</code></pre>
+
+        <h3>8. chrony_config</h3>
+        <p><strong>Purpose:</strong> Configures time synchronization.</p>
+        <pre><code>---
+# vars file for chrony_config
+# /playbooks/roles/chrony_config/vars/main.yml
+
+chrony_servers:
+  - "0.centos.pool.ntp.org"
+  - "1.centos.pool.ntp.org"
+  - "2.centos.pool.ntp.org"
+  - "3.centos.pool.ntp.org"
+
+timezone: "Asia/Colombo"</code></pre>
+
+        <h3>9. selinux-configuration</h3>
+        <p><strong>Purpose:</strong> Configures SELinux.</p>
+        <pre><code>---
+# vars file for selinux-configuration
+# vars/main.yml
+selinux_status: enforcing  # Options: enforcing, permissive, disabled</code></pre>
+
+        <h3>10. yum_update_and_sync</h3>
+        <p><strong>Purpose:</strong> Updates system packages.</p>
+        <pre><code># /playbooks/roles/yum_update_and_sync/tasks/main.yml
+---
+- name: Update all packages without prompting
+  become: true
+  ansible.builtin.command: yum -y update
+  register: update_result
+
+- name: Sync all yum repositories
+  become: true
+  ansible.builtin.command: yum makecache --refresh
+  register: repo_sync_result
+
+- name: Display yum update result
+  debug:
+    msg: "Yum update result: {{ update_result.stdout }}"
+
+- name: Display yum repo sync result
+  debug:
+    msg: "Yum repository sync result: {{ repo_sync_result.stdout }}"</code></pre>
+    </div>
+
+    <div class="section">
         <h2>Running the Playbook</h2>
+        <p>To execute the playbook, use:</p>
         <ol>
-            <li>Edit <code>dev.ini</code> to define target servers:<br>
+            <li>Edit <code>dev.ini</code> file to add on which servers this playbook should run.
                 <pre><code>vi playbooks/dev.ini</code></pre>
             </li>
-            <li>Edit <code>site.yml</code> to select roles:<br>
+            <li>Edit <code>site.yml</code> to configure which roles should run on targeted servers.
                 <pre><code>vi playbooks/site.yml</code></pre>
             </li>
-            <li>Run the playbook:<br>
+            <li>Run the playbook.
                 <pre><code>ansible-playbook -i playbooks/dev.ini playbooks/site.yml --ask-become-pass</code></pre>
             </li>
-            <li>Run the playbook with extra verbosity:<br>
+            <li>Run the playbook with extra verbosity.
                 <pre><code>ansible-playbook -i playbooks/dev.ini playbooks/site.yml --ask-become-pass -vvv</code></pre>
             </li>
         </ol>
     </div>
     <footer style="text-align: center; margin-top: 20px;">
-	<hr>
+    	<hr>
     	<p>© 2025 | All Rights Reserved</p>
     	<p>Written by <a href="https://www.linkedin.com/in/thanurarukshan/" target="_blank">Thanura Rukshan</a></p>
     </footer>
 </body>
 </html>
-
