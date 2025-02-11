@@ -8,7 +8,7 @@
   hosts: all
   become: yes
   roles:
-    #- network-configuration-set
+    - network-configuration-set
     #- user-management
     #- package-management 
     #- system-tuning

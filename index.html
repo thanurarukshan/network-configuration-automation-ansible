@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ansible Network Configuration Automation Playbook</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-left: 5px solid #333;
+            overflow-x: auto;
+        }
+        code {
+            font-family: monospace;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ansible Network Configuration Automation Playbook</h1>
+        <p><strong>By Thanura Rukshan</strong></p>
+        <h2>Overview</h2>
+        <p>This documentation provides a detailed guide on automating network configurations using Ansible.</p>
+
+        <h2>Prerequisites</h2>
+        <ul>
+            <li><strong>Ansible Installation:</strong> Install Ansible on the control node.<br>
+                <pre><code>sudo apt update && sudo apt install ansible -y  # Ubuntu/Debian
+sudo yum install ansible -y  # CentOS/RHEL</code></pre>
+            </li>
+            <li><strong>SSH Access:</strong> Ensure SSH access is configured.<br>
+                <pre><code>ssh-copy-id user@target-server</code></pre>
+            </li>
+            <li><strong>Sudo Privileges:</strong> The Ansible user should have sudo privileges.</li>
+            <li><strong>Inventory File:</strong> Define target servers in <code>playbooks/dev.ini</code>.</li>
+            <li><strong>Python and Dependencies:</strong> Ensure Python and pip are installed.<br>
+                <pre><code>sudo apt install python3 python3-pip -y</code></pre>
+            </li>
+        </ul>
+
+        <h2>Inventory File (playbooks/dev.ini)</h2>
+        <pre><code>[all]
+testserver ansible_host=192.168.1.100 ansible_user=admin ansible_ssh_pass=your_password</code></pre>
+
+        <h2>Playbook Structure</h2>
+        <pre><code>network-configuration-automation-ansible/
+│── ansible.cfg
+│── playbooks/
+│   ├── site.yml
+    ├── dev.ini
+│── roles/
+│   ├── connectivity-test/
+│   ├── network-configuration-set/
+│   ├── user-management/
+│   ├── package-management/
+│   ├── system-tuning/
+│   ├── monitoring/
+│   ├── server-partitioning/
+│   ├── grafana/
+│   ├── node_exporter/
+│   ├── prometheus_installation/
+│   ├── snmp_notifier/
+│   ├── chrony_config/
+│   ├── selinux-configuration/
+│   ├── systemctl_runlevel/
+│   ├── yum_update_and_sync/
+│   ├── scan/</code></pre>
+
+        <h2>Running the Playbook</h2>
+        <ol>
+            <li>Edit <code>dev.ini</code> to define target servers:<br>
+                <pre><code>vi playbooks/dev.ini</code></pre>
+            </li>
+            <li>Edit <code>site.yml</code> to select roles:<br>
+                <pre><code>vi playbooks/site.yml</code></pre>
+            </li>
+            <li>Run the playbook:<br>
+                <pre><code>ansible-playbook -i playbooks/dev.ini playbooks/site.yml --ask-become-pass</code></pre>
+            </li>
+            <li>Run the playbook with extra verbosity:<br>
+                <pre><code>ansible-playbook -i playbooks/dev.ini playbooks/site.yml --ask-become-pass -vvv</code></pre>
+            </li>
+        </ol>
+    </div>
+    <footer style="text-align: center; margin-top: 20px;">
+	<hr>
+    	<p>© 2025 | All Rights Reserved</p>
+    	<p>Written by <a href="https://www.linkedin.com/in/thanurarukshan/" target="_blank">Thanura Rukshan</a></p>
+    </footer>
+</body>
+</html>
+
