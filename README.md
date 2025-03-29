@@ -68,7 +68,7 @@ Update the `inventory/dev.ini` file with your target servers.
 
 Run the playbook:
 ```sh
-ansible-playbook -i inventory/dev.ini playbooks/site.yml --ask-become-pass
+ansible-playbook -i playbooks/dev.ini playbooks/site.yml --ask-become-pass
 ```
 
 Monitor execution and check logs for any failures.
