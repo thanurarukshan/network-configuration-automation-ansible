@@ -3,7 +3,7 @@
 # roles/network-configuration-automation/vars/main.yml
 
 # Network Interface Configuration
-network_interface: eth0  # The network interface to configure (e.g., eth0, ens33)
+network_interface: ens33  # The network interface to configure (e.g., eth0, ens33)
 
 # IP Configuration
 use_dhcp: true  # Set to false for a static IP configuration

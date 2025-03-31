@@ -2,7 +2,7 @@
   hosts: all
   gather_facts: no
   roles:
-    - connectivity-test
+    #- connectivity-test
 
 - name: Configure Network
   hosts: all

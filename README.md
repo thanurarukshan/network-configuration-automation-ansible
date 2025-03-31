@@ -89,10 +89,5 @@ Each role is modular and serves a specific purpose in automating network and sys
 ## Contribution
 Feel free to fork the repository, create a feature branch, and submit a pull request. Issues and suggestions are welcome!
 
-## License
-This project is licensed under the MIT License.
-
 ## Contact
-For any queries or contributions, reach out to [your email or GitHub profile link].
-
-
+For any queries or contributions, reach out to thanurarukshan2000@gmail.com.

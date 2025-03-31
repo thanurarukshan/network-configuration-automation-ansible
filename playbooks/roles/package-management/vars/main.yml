@@ -7,5 +7,5 @@ install_packages:
   - wget
 
 remove_packages:
-  - nmap
+  - wget
 
